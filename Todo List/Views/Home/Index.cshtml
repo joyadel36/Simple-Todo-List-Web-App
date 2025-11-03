@@ -1,0 +1,79 @@
+﻿@model List<Todo_List.Models.TodoListItem>
+
+@{
+    ViewData["Title"] = "My Todo List";
+ }
+
+<h2 class="text-center mb-3">My Todo List</h2>
+@if (TempData["Message"] != null)
+{
+    var success = TempData["Success"] != null && (bool)TempData["Success"];
+    string alertClass = success ? "alert-success" : "alert-warning";
+
+    <div class="alert @alertClass alert-dismissible fade show" role="alert">
+        @TempData["Message"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<form asp-action="Add" method="post" class="mb-3">
+    <div class="row g-2 align-items-center">
+        <div class="col-10">
+            <input type="text" name="title" placeholder="Enter new task..." class="form-control" />
+        </div>
+        <div class="col-2">
+            <button type="submit" class="btn btn-primary w-100">Add</button>
+        </div>
+    </div>
+</form>
+
+<table class="table table-hover text-center align-middle shadow-sm mt-3">
+    <thead >
+        <tr>
+            <th style="width: 50%;">Task</th>
+            <th style="width: 15%;">Status</th>
+            <th style="width: 35%;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="@(item.IsCompleted ? "table-success" : "")">
+                <td class="text-start">
+                    <span class="@(item.IsCompleted ? "text-decoration-line-through text-secondary" : "fw-semibold")">
+                        @item.Title
+                    </span>
+                </td>
+
+                <td>
+                    <input type="checkbox" disabled @(item.IsCompleted ? "checked" : "") />
+                </td>
+
+                <td>
+                    <div class="d-flex justify-content-center gap-2">
+                        <form asp-action="Toggle" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-warning btn-sm">
+                                <i class="fa-solid fa-rotate"></i>
+                                @(item.IsCompleted ? "Mark as Pending" : "Mark as Done")
+                            </button>
+                        </form>
+
+                        <form asp-action="Delete" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fa-solid fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
